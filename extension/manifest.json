@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3, "name": "BotAnalyzer — local evidence review", "version": "0.1.0",
+  "description": "Collect visible TikTok comments on click and review patterns locally.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "action": {"default_title": "BotAnalyzer: prikupi vidljive TikTok komentare"},
+  "background": {"service_worker": "extension/worker.js", "type": "module"},
+  "options_page": "index.html",
+  "content_security_policy": {"extension_pages": "script-src 'self'; object-src 'none'; connect-src 'none'; img-src 'self' data: blob:; style-src 'self'"}
+}
