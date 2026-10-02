@@ -1,8 +1,8 @@
 # BotAnalyzer
 
-Local, open source review of possible coordinated social media activity. **Find patterns, inspect evidence, and prepare a report.** Version 0.1.0, MIT licensed.
+Local, open source review of possible coordinated social media activity. **Find patterns, inspect evidence, and prepare a report.** Version 0.2.0-beta, MIT licensed.
 
-Currently includes TikTok. Additional platforms plug into an adapter interface. No API keys, telemetry, backend database, npm dependencies, or cloud processing.
+Currently includes **TikTok** (with experimental visible-comment capture) and **Instagram** (manual entry and import only). Additional platforms plug into an adapter interface. No API keys, telemetry, backend database, npm dependencies, or cloud processing.
 
 **This is a review assistant, not a bot classifier.** Similar comments, names, and avatars do not establish automation, account ownership, or account purchases. Political views, private profiles, and follower counts are not used as suspicion signals.
 
@@ -27,14 +27,16 @@ npm run build:extension
 1. Open `chrome://extensions` (or the corresponding Chromium extensions page).
 2. Enable **Developer mode** and click **Load unpacked**.
 3. Select `dist/extension` (not the project root).
-4. Open TikTok, display comments, and click the extension icon.
+4. Open TikTok, display comments, and click the extension icon (Instagram: use manual entry or JSON import in the dashboard).
 5. Open **Dodaj / uvezi → Uvezi poslednju kolekciju iz dodatka**, inspect the preview, and save.
 
-The downloadable source archive also contains a prebuilt `dist/extension` folder. The extension uses only `activeTab`, `scripting`, and `storage`; no permanent host permissions or background crawl. Comment collection is **experimental**, based on a few TikTok DOM selectors. It captures comments currently rendered in the visible viewport, up to 250 per click. It does not scroll or open profiles. Always verify author/text association in the preview. Avatar comparison uses manually supplied cropped images.
+The extension uses only `activeTab`, `scripting`, and `storage`; no permanent host permissions or background crawl. TikTok comment collection is **experimental**, based on a few DOM selectors. Instagram has **no automatic collector** in this version. Always verify author/text association in the preview. Avatar comparison uses manually supplied cropped images.
 
 ## Features
 
+- Network picker (TikTok, Instagram) for manual entry and paste import.
 - Manual evidence entry, TSV paste, JSON import/export, spreadsheet-safe CSV, and old standalone `tiktok-dokazi.html` backup migration.
+- Schema v2 evidence model with migration from v1 backups.
 - Identical normalized comment groups (at least 3 different profiles, 16 characters and 4 distinct words).
 - Pair review: exact/near text, common username with numeric suffix differences, and similar avatar fingerprints.
 - Independent clues shown separately; pair review priority is not a probability.
@@ -73,4 +75,4 @@ docs/          setup, architecture, privacy, validation
 
 See [ARCHITECTURE.md](docs/ARCHITECTURE.md), [CONTRIBUTING.md](CONTRIBUTING.md), and [PRIVACY.md](docs/PRIVACY.md).
 
-This archive is ready to commit to a Git repository. It has not been published to GitHub or the Chrome Web Store.
+This project has not been published to the Chrome Web Store. See [PLATFORM-ACCESS.md](docs/PLATFORM-ACCESS.md) and [IMPLEMENTATION-STATUS.md](docs/IMPLEMENTATION-STATUS.md) for current scope and verification notes.

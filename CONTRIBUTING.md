@@ -4,10 +4,10 @@ Use Node.js 20+. There are no runtime dependencies. Run `npm test` and `npm run 
 
 ## Add a network
 
-1. Create `src/adapters/<platform>.js` exporting `{id,name,canonicalProfile,handle,validPost,reporting}`. Return `null` for invalid URLs. Allowlist actual HTTPS platform hosts.
+1. Create `src/adapters/<platform>.js` exporting the adapter contract: `{id,name,supportedHosts,capabilities,canonicalProfile,parseProfileIdentity,handle,validPost,canonicalPost,detectPage,reporting}`. Return `null` for invalid URLs. Allowlist actual HTTPS platform hosts in `supportedHosts`.
 2. Register it in `src/adapters/index.js`. The matching engine already partitions evidence by platform.
-3. Extend the UI platform picker (v0.1 currently labels manual entry as TikTok).
-4. Add user-triggered capture separately; never insert platform-specific DOM selectors into the matching engine. Update the extension dispatch allowlist when supported.
+3. Add the platform to the UI network picker in `src/ui/app.js` (via `listAdapters()`).
+4. Add user-triggered capture separately only after access review; register in `extension/worker.js` via `collectors` map and `supportedHosts`. Never insert DOM selectors into the matching engine.
 5. Add URL spoofing tests, fixtures for comment-author association and documentation of permission requirements.
 6. Verify reporting instructions using the network's primary documentation. Automated mass reporting is outside this project scope.
 

@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import {tiktok} from '../src/adapters/tiktok.js';
 import {registerAdapter} from '../src/adapters/index.js';
 import {normalizeText,usernameStem} from '../src/core/text.js';
-import {validateRecord,mergeRecords,emptyState,importState} from '../src/core/model.js';
+import {instagram} from '../src/adapters/instagram.js';
+import {validateRecord,mergeRecords,emptyState,importState,migrateStateV1,SCHEMA_VERSION} from '../src/core/model.js';
 import {analyze} from '../src/core/analyze.js';
 import {compareAvatars,fingerprintsFromGray,hamming} from '../src/core/image.js';
 import {buildReport,csv} from '../src/core/report.js';
@@ -24,3 +25,52 @@ test('legacy JSON migration keeps text but flags image-only records',()=>{const 
 test('invalid imports are reported and HTML avatar data rejected',()=>{const result=importState({schemaVersion:1,records:[{profile:'https://evil.test',text:'test'}]});assert.equal(result.errors.length,1);assert.throws(()=>record('@primer22',message,{avatar:{dhash:'0000000000000000',ahash:'0000000000000000',contrast:12,thumb:'data:text/html;base64,AAA'}}));});
 test('CSV neutralizes spreadsheet formulas and quotes',()=>{const out=csv([record('@primer22','=HYPERLINK("bad")')]);assert.ok(out.includes('"\'=HYPERLINK(""bad"")"'));});
 test('adapter partition prevents cross-network findings',()=>{registerAdapter({id:'fixture',name:'Fixture',canonicalProfile:x=>String(x).startsWith('https://fixture.test/')?x:null,handle:x=>x.split('/').pop(),validPost:x=>x||'',reporting:{steps:[],helpUrl:''}});const a=record('@primer22'),b=validateRecord({platform:'fixture',profile:'https://fixture.test/primer23',text:message});assert.equal(analyze([a,b]).pairs.length,0);});
+
+test('instagram profile and post URLs parse correctly',()=>{
+  assert.equal(instagram.canonicalProfile('https://www.instagram.com/korisnik/',true),'https://www.instagram.com/korisnik/');
+  assert.equal(instagram.canonicalProfile('@korisnik',true),'https://www.instagram.com/korisnik/');
+  assert.equal(instagram.canonicalProfile('@korisnik',false),null);
+  assert.equal(instagram.validPost('https://www.instagram.com/p/ABC123/?igsh=foo'),'https://www.instagram.com/p/ABC123/');
+  assert.equal(instagram.validPost('https://www.instagram.com/reel/XYZ789/?utm_source=share'),'https://www.instagram.com/reel/XYZ789/');
+  assert.equal(instagram.detectPage('https://www.instagram.com/p/ABC123/'),'post');
+  assert.equal(instagram.detectPage('https://www.instagram.com/reel/XYZ789/'),'reel');
+});
+
+test('instagram rejects spoofed domains and reserved paths',()=>{
+  for(const input of ['https://instagram.com.evil.test/korisnik/','javascript:alert(1)','http://www.instagram.com/korisnik/','https://www.instagram.com/accounts/login/','https://www.instagram.com/direct/inbox/','https://www.instagram.com/explore/','https://www.instagram.com/stories/korisnik/'])assert.equal(instagram.canonicalProfile(input,true),null);
+  assert.equal(instagram.validPost('https://www.instagram.com/korisnik/'),null);
+});
+
+test('instagram comment URL keeps comment id after tracking strip',()=>{
+  const post='https://www.instagram.com/p/ABC123/';
+  const url=instagram.canonicalCommentUrl(post,'17841400000000001');
+  assert.ok(url?.includes('comment_id=17841400000000001'));
+  assert.ok(!url?.includes('igsh='));
+});
+
+test('instagram mention is not treated as profile author',()=>{
+  assert.equal(instagram.isMention('@pomenut_korisnik'),true);
+  assert.equal(instagram.commentAuthorFromProfile('@pomenut_korisnik'),'https://www.instagram.com/pomenut_korisnik/');
+  const postAuthor='https://www.instagram.com/autor_objave/';
+  const commentAuthor='https://www.instagram.com/komentator/';
+  assert.notEqual(postAuthor,commentAuthor);
+});
+
+test('schema v1 migrates to v2 with accountKey and caseId',()=>{
+  const v1={schemaVersion:1,records:[{id:'r1',platform:'tiktok',profile:'https://www.tiktok.com/@primer22',handle:'primer22',postUrl:'https://www.tiktok.com/@primer22/video/1',text:message,source:'import',observedAt:'2026-01-01T00:00:00.000Z'}],reviews:{},settings:{nearText:true}};
+  const migrated=migrateStateV1(v1);
+  assert.equal(migrated.schemaVersion,SCHEMA_VERSION);
+  assert.equal(migrated.records.length,1);
+  assert.equal(migrated.records[0].accountKey,'tiktok:primer22');
+  assert.equal(migrated.records[0].caseId,'default');
+  assert.equal(migrated.records[0].source,'paste');
+  assert.equal(migrated.records[0].schemaVersion,SCHEMA_VERSION);
+});
+
+test('same handle on different networks stays separate',()=>{
+  const tik=validateRecord({platform:'tiktok',profile:'@primer22',text:message,postUrl:'https://www.tiktok.com/@primer22/video/1',source:'manual'});
+  const ig=validateRecord({platform:'instagram',_explicitPlatform:true,profile:'@primer22',text:message,postUrl:'https://www.instagram.com/p/ABC123/',source:'manual'});
+  assert.equal(analyze([tik,ig]).pairs.length,0);
+  assert.equal(tik.accountKey,'tiktok:primer22');
+  assert.equal(ig.accountKey,'instagram:primer22');
+});
