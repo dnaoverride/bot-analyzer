@@ -32,7 +32,9 @@ Pairs with at least two independent signal types are prioritized, not declared b
 
 Each adapter exports `{ id, name, supportedHosts, capabilities, canonicalProfile, parseProfileIdentity, handle, validPost, canonicalPost, detectPage, reporting }`. See CONTRIBUTING.md.
 
-Registered platforms: **TikTok** (experimental visible-comment capture), **Instagram** (manual import only; no DOM collector in v0.2.0).
+Registered platforms: **TikTok** (experimental visible-comment capture in dev build), **Instagram** (manual import only; no DOM collector).
+
+State `schemaVersion` 3 adds `cases`, `activeCaseId`, and `submissions` (manual per-platform status). Evidence packages (`botanalyzer-evidence-package.v1`) support `purpose: report` (included findings only) and `purpose: share` (records only; recipient re-reviews).
 
 Matching code uses the platform ID and never compares profiles across platform boundaries. TikTok and Instagram accounts with the same handle are separate evidence.
 

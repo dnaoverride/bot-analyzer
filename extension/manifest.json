@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3, "name": "BotAnalyzer — Comment Pattern Review", "version": "0.2.0", "version_name": "0.2.0-beta",
+  "manifest_version": 3, "name": "BotAnalyzer — Comment Pattern Review", "version": "0.3.0", "version_name": "0.3.0-beta",
   "description": "Review comment patterns on TikTok and Instagram locally. Manual entry and import; TikTok capture is experimental.",
   "permissions": ["activeTab", "scripting", "storage"],
   "action": {"default_title": "BotAnalyzer: prikupi vidljive TikTok komentare"},

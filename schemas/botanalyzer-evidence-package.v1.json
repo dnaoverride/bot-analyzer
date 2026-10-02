@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://botanalyzer.local/schemas/botanalyzer-evidence-package.v1.json",
+  "title": "BotAnalyzer Evidence Package v1",
+  "type": "object",
+  "required": ["packageSchema", "purpose", "generatedAt", "disclaimer", "case", "records"],
+  "properties": {
+    "packageSchema": {"const": "botanalyzer-evidence-package.v1"},
+    "purpose": {"enum": ["report", "share"]},
+    "generatedAt": {"type": "string", "format": "date-time"},
+    "disclaimer": {"type": "string"},
+    "case": {
+      "type": "object",
+      "required": ["id", "title"],
+      "properties": {
+        "id": {"type": "string"},
+        "title": {"type": "string"}
+      }
+    },
+    "platforms": {"type": "array", "items": {"type": "string"}},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "platform", "title", "recordIds"],
+        "properties": {
+          "id": {"type": "string"},
+          "kind": {"type": "string"},
+          "platform": {"type": "string"},
+          "title": {"type": "string"},
+          "explanation": {"type": ["string", "null"]},
+          "signals": {"type": "array"},
+          "recordIds": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["platform", "profileUrl", "handle", "observedAt", "source"],
+        "properties": {
+          "id": {"type": "string"},
+          "platform": {"type": "string"},
+          "profileUrl": {"type": "string"},
+          "handle": {"type": "string"},
+          "postUrl": {"type": "string"},
+          "commentUrl": {"type": ["string", "null"]},
+          "commentId": {"type": ["string", "null"]},
+          "postAuthor": {"type": ["string", "null"]},
+          "text": {"type": "string"},
+          "note": {"type": "string"},
+          "observedAt": {"type": "string"},
+          "source": {"type": "string"}
+        }
+      }
+    },
+    "submission": {"type": "object"}
+  }
+}

@@ -1,42 +1,40 @@
 # Implementation status
 
-Last updated: 2026-10-01 (v0.2.0)
+Last updated: 2026-10-02 (v0.3.0)
 
-## v0.2.0 — completed in this cycle
+## v0.3.0 — completed
 
 | Area | Status |
 |---|---|
-| Extended adapter contract | Done |
-| Evidence model schema v2 + v1 migration | Done |
-| Instagram manual adapter | Done |
-| Network picker and platform filter in UI | Done |
-| Per-platform report instructions | Done |
-| Extension worker `supportedHosts` dispatch | Done (TikTok collector only) |
-| `docs/PLATFORM-ACCESS.md` | Done |
-| Core tests | **21 pass** (`npm test`, 2026-10-01) |
+| Case management (schema v3) | Done |
+| Manual submission status per platform | Done |
+| Evidence package JSON (report + share) | Done |
+| Shareable case import/export | Done |
+| Instagram post author + comment ID fields | Done |
+| sr/en localization | Done |
+| TikTok fixture capture test | Done |
+| `npm run package:store` + SHA-256 | Done |
+| Store docs + PRIVACY-POLICY.md draft | Done |
+| Playwright dashboard test | Done |
+
+## Tests (2026-10-02)
+
+```
+npm test          # 23 pass
+npm run test:browser   # 1 pass
+```
 
 ## Still not implemented
 
 | Area | Status |
 |---|---|
-| Instagram DOM collector | Not implemented; marked unverified |
-| TikTok collector live-session verification | Not verified in CI |
-| Browser / Playwright tests | Not implemented |
-| Chrome Web Store package (`package:store`) | Not implemented |
-| Store icons, `docs/store/*`, public privacy URL | Not implemented |
-| Case management UI | Not implemented (only `caseId: 'default'`) |
+| Instagram DOM collector | Not implemented |
 | IndexedDB storage | Not implemented |
-| English localization | Not implemented |
+| YouTube / Bluesky / Mastodon adapters | Not implemented |
+| Chrome Web Store publication | Not submitted |
+| Public privacy/support HTTPS URLs | PLACEHOLDER in docs |
 
-## Test results (2026-10-01)
+## Store package
 
-```
-npm test
-# 21 tests, 21 pass, 0 fail
-```
-
-## Verification notes
-
-- TikTok collector: selectors not validated against a live signed-in session in CI.
-- Instagram: manual entry/import only; no automatic collection.
-- No claim of Chrome Web Store publication or approval.
+- Dev build: `npm run build:extension` (includes TikTok collector, `activeTab` + `scripting`)
+- Store build: `npm run package:store` → `release/botanalyzer-0.3.0-chrome.zip` (`storage` only, no collector)

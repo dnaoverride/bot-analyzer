@@ -1,8 +1,8 @@
 # BotAnalyzer
 
-Local, open source review of possible coordinated social media activity. **Find patterns, inspect evidence, and prepare a report.** Version 0.2.0-beta, MIT licensed.
+Local, open source review of possible coordinated social media activity. **Find patterns, inspect evidence, and prepare a report.** Version 0.3.0-beta, MIT licensed.
 
-Currently includes **TikTok** (with experimental visible-comment capture) and **Instagram** (manual entry and import only). Additional platforms plug into an adapter interface. No API keys, telemetry, backend database, npm dependencies, or cloud processing.
+Currently includes **TikTok** (with experimental visible-comment capture in dev build) and **Instagram** (manual entry and import only). Multiple local **cases**, standardized **evidence packages**, and **shareable case** JSON for coordinated review across users (each person submits their own report manually). No API keys, telemetry, backend database, npm dependencies, or cloud processing.
 
 **This is a review assistant, not a bot classifier.** Similar comments, names, and avatars do not establish automation, account ownership, or account purchases. Political views, private profiles, and follower counts are not used as suspicion signals.
 
@@ -57,9 +57,18 @@ JSON backups contain public profile links, comments, notes, and small avatars. K
 
 ```sh
 npm test
+npm run test:browser   # requires npm install once
 ```
 
-Uses Node's built-in test runner with no dependencies. See [VALIDATION.md](docs/VALIDATION.md) for the browser checks and limits of verification.
+Core tests use Node's built-in runner. Playwright covers the dashboard flow. See [VALIDATION.md](docs/VALIDATION.md).
+
+## Chrome Web Store package (manual build)
+
+```sh
+npm run package:store
+```
+
+Produces `release/botanalyzer-0.3.0-chrome.zip` with `manifest.json` at ZIP root, `storage` permission only (no DOM collector). See [docs/store/PUBLISHING-CHECKLIST-SR.md](docs/store/PUBLISHING-CHECKLIST-SR.md). **Not published yet.**
 
 ## Project layout
 

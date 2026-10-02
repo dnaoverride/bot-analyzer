@@ -1,4 +1,4 @@
-import {emptyState, importState, migrateStateV1, SCHEMA_VERSION} from './model.js';
+import {emptyState, normalizeLoadedState, SCHEMA_VERSION} from './model.js';
 
 const KEY = 'bot-analyzer-state-v1';
 export const extensionMode = !!globalThis.chrome?.storage?.local;
@@ -14,41 +14,17 @@ export async function loadState() {
       : JSON.parse(localStorage.getItem(KEY) || 'null');
     if (!raw) return emptyState();
 
-    let working = raw;
-    let migrationErrors = [];
-
-    if (raw.schemaVersion === 1) {
-      const migrated = migrateStateV1(raw);
-      migrationErrors = migrated.errors || [];
-      working = {
-        schemaVersion: SCHEMA_VERSION,
-        records: migrated.records,
-        reviews: migrated.reviews,
-        settings: migrated.settings
-      };
+    const state = normalizeLoadedState(raw);
+    if (state.importErrors?.length) {
+      throw Error('Neki sačuvani unosi nisu ispravni. ' + state.importErrors.join(' '));
     }
+    delete state.importErrors;
 
-    const imported = importState(working);
-    if (imported.errors.length) {
-      const detail = [...imported.errors, ...migrationErrors].join(' ');
-      throw Error('Neki sačuvani unosi nisu ispravni. ' + detail);
+    const needsSave = raw.schemaVersion !== SCHEMA_VERSION;
+    if (needsSave) {
+      try { await saveState(state); }
+      catch (e) { throw Error('Migracija nije sačuvana; originalni podaci nisu obrisani. ' + e.message); }
     }
-
-    const reviews = Object.fromEntries(
-      Object.entries(working.reviews || {}).filter(([key, value]) =>
-        typeof key === 'string' && ['pending', 'include', 'dismiss'].includes(value))
-    );
-    const settings = {nearText: working.settings?.nearText !== false, imageThreshold: 5};
-    const state = {...emptyState(), records: imported.records, reviews, settings};
-
-    if (raw.schemaVersion === 1) {
-      try {
-        await saveState(state);
-      } catch (e) {
-        throw Error('Migracija nije sačuvana; originalni podaci nisu obrisani. ' + e.message);
-      }
-    }
-
     return state;
   } catch (e) {
     throw Error('Ne mogu da učitam podatke: ' + e.message);

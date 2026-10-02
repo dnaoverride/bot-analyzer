@@ -1,8 +1,8 @@
-# Verification for v0.2.0
+# Verification for v0.3.0
 
 ## Automated core checks
 
-`npm test` covers URL host spoofing, repeated-message deduplication, review gating of reports, false-positive cases (short comments and blank images), text normalization, numeric username suffix matching, cross-platform separation, legacy JSON migration, schema v1→v2 migration, Instagram URL validation, and spreadsheet formula escaping. As of v0.2.0: 21 tests, all passing in Node.
+`npm test` covers URL spoofing, deduplication, review gating, false positives, migrations v1→v3, cases, share import (no copied reviews), evidence packages, Instagram URLs, TikTok fixture capture, and CSV escaping. As of v0.3.0: 23 Node tests. `npm run test:browser`: Playwright dashboard flow (manual entry, analysis, report, reload).
 
 ## Browser verification
 
